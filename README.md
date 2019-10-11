@@ -1,13 +1,18 @@
-
+# Test cases for https://github.com/getquill/quill/issues/1665
 
 - **Version**: 3.4.9
 - **Module**: quill-cassandra
 - **Database**: Cassandra (I have version 3.11.4 locally, but I don't believe the error is on Cassandra's side)
+- **See also**:
+    - https://github.com/getquill/quill/issues/535 talks about `NullPointerException`s for custom types
+        (this issue concerns `IllegalArgumentException`s (albeit basically `NullPointerException`s) for a built-in type)
+    - https://github.com/onzo-com/quill-bigdecimal-null-bug contains test cases that trigger this bug
 
+[repo]: https://github.com/onzo-com/quill-bigdecimal-null-bug
 
 ## Expected Behaviour
 
-All test cases in this repo pass.
+All test cases in [this repo][repo] pass.
 
 ```
 [info] BugReport:
@@ -23,7 +28,7 @@ All test cases in this repo pass.
 
 ## Actual Behaviour
 
-Two test cases in this repo fail.
+Two test cases in [this repo][repo] fail.
 
 ```
 [info] BugReport:
@@ -57,7 +62,7 @@ There is no general workaround.
 ## Fix
 
 Applying this diff to the quill repository, publishing locally, then referencing the snapshot version when running the tests,
-is enough to make the tests in this repository pass.
+is enough to make the tests in [this repository][repo] pass.
 
 ```
 --- a/quill-cassandra/src/main/scala/io/getquill/context/cassandra/encoding/CassandraTypes.scala
