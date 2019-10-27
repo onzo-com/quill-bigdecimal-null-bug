@@ -14,35 +14,37 @@
 
 All test cases in [this repo][repo] pass.
 
-```
-[info] BugReport:
-[info] a Udt containing compulsory fields
-[info] - should read a non-null value correctly
-[info] - should read a null text value as null, without throwing
-[info] - should read a null decimal value as null, without throwing
-[info] a Udt containing optional fields
-[info] - should read a non-null value correctly
-[info] - should read a null text value as None, without throwing
-[info] - should read a null decimal value as None, without throwing
-```
-
 ## Actual Behaviour
 
-Two test cases in [this repo][repo] fail.
+Three test cases in [this repo][repo] fail.
 
 ```
 [info] BugReport:
 [info] a Udt containing compulsory fields
-[info] - should read a non-null value correctly
-[info] - should read a null text value as null, without throwing
-[info] - should read a null decimal value as null, without throwing *** FAILED ***
-[info]   The future returned an exception of type: java.lang.IllegalArgumentException, with message: null value for BigDecimal. (BugReport.scala:58)
+[info]   should read
+[info]   - a non-null value correctly
+[info]   - a null text value as null, without throwing
+[info]   - a null decimal value as null, without throwing *** FAILED ***
+[info]     The future returned an exception of type: java.lang.IllegalArgumentException, with message: null value for BigDecimal. (BugReport.scala:66)
+[info]   should write
+[info]   - a non-null value correctly
+[info]   - a null text value as null, without throwing
+[info]   - a null decimal value as null, without throwing *** FAILED ***
+[info]     The future returned an exception of type: java.lang.NullPointerException. (BugReport.scala:109)
 [info] a Udt containing optional fields
-[info] - should read a non-null value correctly
-[info] - should read a null text value as None, without throwing
-[info] - should read a null decimal value as None, without throwing *** FAILED ***
-[info]   The future returned an exception of type: java.lang.IllegalArgumentException, with message: null value for BigDecimal. (BugReport.scala:109)
+[info]   should read
+[info]   - a non-null value correctly
+[info]   - a null text value as None, without throwing
+[info]   - a null decimal value as None, without throwing *** FAILED ***
+[info]     The future returned an exception of type: java.lang.IllegalArgumentException, with message: null value for BigDecimal. (BugReport.scala:176)
+[info]   should write
+[info]   - a non-None value correctly
+[info]   - a None text value as null, without throwing
+[info]   - a None decimal value as null, without throwing
 ```
+
+(You could argue that the “compulsory fields” test failures aren't bugs, because they involve `null` values in a Scala
+case class. But the “optional fields” test failure is surely a bug.)
 
 ## Running the tests
 
@@ -62,7 +64,7 @@ There is no general workaround.
 ## Fix
 
 Applying this diff to the quill repository, publishing locally, then referencing the snapshot version when running the tests,
-is enough to make the tests in [this repository][repo] pass.
+is enough to make the “should read“ tests in [this repository][repo] pass.
 
 ```
 --- a/quill-cassandra/src/main/scala/io/getquill/context/cassandra/encoding/CassandraTypes.scala
@@ -81,6 +83,8 @@ is enough to make the tests in [this repository][repo] pass.
    implicit val decodeByteArray: CassandraMapper[ByteBuffer, Array[Byte]] = CassandraMapper(bb => {
 ```
 
-Although this is enough for my immediate use case, a complete fix may also need to consider
-- null-checking in decoders for other types
-- null-checking in encoders
+This is enough for my immediate use case.
+
+I've not yet attempted to get the failing “should write” test case to pass.
+
+A complete fix may also need to consider null-checking in decoders/encoders for other types.
